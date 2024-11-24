@@ -4,28 +4,34 @@ package de.uni_passau.fim.se2.se.test_prioritisation.stopping_conditions;
  * Stopping condition that stops the search after a specified number of fitness evaluations.
  */
 public class MaxFitnessEvaluations implements StoppingCondition {
+    private final int maxFitnessEvaluations;
+    private int fitnessEvaluationCount;
 
     public MaxFitnessEvaluations(final int maxFitnessEvaluations) {
-        throw new UnsupportedOperationException("Implement me");
+        if (maxFitnessEvaluations <= 0) {
+            throw new IllegalArgumentException("Maximum fitness evaluations must be greater than zero.");
+        }
+        this.maxFitnessEvaluations = maxFitnessEvaluations;
+        this.fitnessEvaluationCount = 0; 
     }
 
     @Override
     public void notifySearchStarted() {
-        throw new UnsupportedOperationException("Implement me");
+        fitnessEvaluationCount = 0;
     }
 
     @Override
     public void notifyFitnessEvaluation() {
-        throw new UnsupportedOperationException("Implement me");
+        fitnessEvaluationCount++;
     }
 
     @Override
     public boolean searchMustStop() {
-        throw new UnsupportedOperationException("Implement me");
+        return fitnessEvaluationCount >= maxFitnessEvaluations;
     }
 
     @Override
     public double getProgress() {
-        throw new UnsupportedOperationException("Implement me");
+        return Math.min(1.0, (double) fitnessEvaluationCount / maxFitnessEvaluations);
     }
 }

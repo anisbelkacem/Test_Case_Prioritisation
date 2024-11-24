@@ -13,12 +13,22 @@ import de.uni_passau.fim.se2.se.test_prioritisation.stopping_conditions.Stopping
  * @param <E> the type of encoding
  */
 public final class RandomSearch<E extends Encoding<E>> implements SearchAlgorithm<E> {
+    private final StoppingCondition stoppingCondition;
+    private final EncodingGenerator<E> encodingGenerator;
+    private final FitnessFunction<E> fitnessFunction;
+
+    private E bestSolution;
+    private double bestFitness;
 
     public RandomSearch(
             final StoppingCondition stoppingCondition,
             final EncodingGenerator<E> encodingGenerator,
             final FitnessFunction<E> fitnessFunction) {
-        throw new UnsupportedOperationException("Implement me");
+            this.stoppingCondition = stoppingCondition;
+            this.encodingGenerator = encodingGenerator;
+            this.fitnessFunction = fitnessFunction;
+            this.bestSolution = null;
+            this.bestFitness = Double.NEGATIVE_INFINITY;
     }
 
     /**
@@ -28,11 +38,21 @@ public final class RandomSearch<E extends Encoding<E>> implements SearchAlgorith
      */
     @Override
     public E findSolution() {
-        throw new UnsupportedOperationException("Implement me");
-    }
+        stoppingCondition.notifySearchStarted();
 
+        while (!stoppingCondition.searchMustStop()) {
+            E candidateSolution = encodingGenerator.get();
+            double candidateFitness = fitnessFunction.applyAsDouble(candidateSolution);
+            stoppingCondition.notifyFitnessEvaluation();
+            if (candidateFitness > bestFitness) {
+                bestFitness = candidateFitness;
+                bestSolution = candidateSolution;
+            }
+        }
+        return bestSolution;
+    }
     @Override
     public StoppingCondition getStoppingCondition() {
-        throw new UnsupportedOperationException("Implement me");
+        return stoppingCondition;
     }
 }

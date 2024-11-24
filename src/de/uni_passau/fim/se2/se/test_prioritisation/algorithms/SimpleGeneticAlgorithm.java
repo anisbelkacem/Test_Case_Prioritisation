@@ -7,9 +7,21 @@ import de.uni_passau.fim.se2.se.test_prioritisation.fitness_functions.FitnessFun
 import de.uni_passau.fim.se2.se.test_prioritisation.parent_selection.ParentSelection;
 import de.uni_passau.fim.se2.se.test_prioritisation.stopping_conditions.StoppingCondition;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements SearchAlgorithm<E> {
+
+    private final StoppingCondition stoppingCondition;
+    private final EncodingGenerator<E> encodingGenerator;
+    private final FitnessFunction<E> fitnessFunction;
+    private final Crossover<E> crossover;
+    private final ParentSelection<E> parentSelection;
+    private final Random random;
 
     /**
      * Creates a new simple genetic algorithm with the given components.
@@ -28,7 +40,12 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
             final Crossover<E> crossover,
             final ParentSelection<E> parentSelection,
             final Random random) {
-        throw new UnsupportedOperationException("Implement me");
+                this.stoppingCondition = stoppingCondition;
+                this.encodingGenerator = encodingGenerator;
+                this.fitnessFunction = fitnessFunction;
+                this.crossover = crossover;
+                this.parentSelection = parentSelection;
+                this.random = random;
     }
 
     /**
@@ -38,11 +55,38 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
      */
     @Override
     public E findSolution() {
-        throw new UnsupportedOperationException("Implement me");
+        notifySearchStarted();
+        int minSize = 50;
+        int maxSize = 200; 
+        int populationSize = random.nextInt(maxSize - minSize + 1) + minSize;
+        List<E> population = new ArrayList<>();
+        for (int i = 0; i < populationSize; i++) {
+            population.add(encodingGenerator.get());
+        }
+        while (!searchMustStop()) {
+            E parent1 = parentSelection.selectParent(population);
+            E parent2 = parentSelection.selectParent(population);
+            E offspring = crossover.apply(parent1, parent2);
+            double offspringFitness = fitnessFunction.applyAsDouble(offspring);
+            notifyFitnessEvaluation();
+    
+            E worstIndividual = population.stream()
+                    .min(Comparator.comparing(fitnessFunction::applyAsDouble))
+                    .orElseThrow();
+    
+            double worstFitness = fitnessFunction.applyAsDouble(worstIndividual);
+            if (offspringFitness > worstFitness) {
+                population.remove(worstIndividual);
+                population.add(offspring);
+            }
+        }
+        return population.stream()
+                .max(Comparator.comparing(fitnessFunction::applyAsDouble))
+                .orElseThrow();
     }
-
+    
     @Override
     public StoppingCondition getStoppingCondition() {
-        throw new UnsupportedOperationException("Implement me");
+        return stoppingCondition;
     }
 }

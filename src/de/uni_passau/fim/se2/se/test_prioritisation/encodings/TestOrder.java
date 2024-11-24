@@ -23,7 +23,10 @@ public class TestOrder extends Encoding<TestOrder> {
      */
     public TestOrder(Mutation<TestOrder> mutation, int[] positions) {
         super(mutation);
-        throw new UnsupportedOperationException("Implement me");
+        if (!isValid(positions)) {
+            throw new IllegalArgumentException("The test positions are not valid!");
+        }
+        this.positions = positions.clone();
     }
 
     /**
@@ -35,7 +38,23 @@ public class TestOrder extends Encoding<TestOrder> {
      * @return {@code true} if the given prioritization is valid, {@code false} otherwise
      */
     public static boolean isValid(final int[] tests) {
-        throw new UnsupportedOperationException("Implement me");
+        if (tests == null || tests.length == 0) {
+            return false;
+        }
+    
+        int n = tests.length;
+        boolean[] seen = new boolean[n];
+    
+        for (int test : tests) {
+            if (test < 0 || test >= n) {
+                return false; 
+            }
+            if (seen[test]) {
+                return false; 
+            }
+            seen[test] = true;
+        }
+        return true; 
     }
 
     /**
@@ -43,7 +62,8 @@ public class TestOrder extends Encoding<TestOrder> {
      */
     @Override
     public TestOrder deepCopy() {
-        throw new UnsupportedOperationException("Implement me");
+        int[] copiedPositions = positions.clone();
+        return new TestOrder(this.getMutation(), copiedPositions);
     }
 
     /**

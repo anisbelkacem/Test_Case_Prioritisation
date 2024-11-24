@@ -13,6 +13,9 @@ import de.uni_passau.fim.se2.se.test_prioritisation.stopping_conditions.Stopping
  */
 public final class RandomWalk<E extends Encoding<E>> implements SearchAlgorithm<E> {
 
+    private final StoppingCondition stoppingCondition;
+    private final EncodingGenerator<E> encodingGenerator;
+    private final FitnessFunction<E> fitnessFunction;
     /**
      * Constructs a new random walk algorithm.
      *
@@ -24,7 +27,9 @@ public final class RandomWalk<E extends Encoding<E>> implements SearchAlgorithm<
             final StoppingCondition stoppingCondition,
             final EncodingGenerator<E> encodingGenerator,
             final FitnessFunction<E> fitnessFunction) {
-        throw new UnsupportedOperationException("Implement me");
+        this.stoppingCondition = stoppingCondition;
+        this.encodingGenerator = encodingGenerator;
+        this.fitnessFunction = fitnessFunction;
     }
 
     /**
@@ -36,12 +41,27 @@ public final class RandomWalk<E extends Encoding<E>> implements SearchAlgorithm<
      */
     @Override
     public E findSolution() {
-        throw new UnsupportedOperationException("Implement me");
+        stoppingCondition.notifySearchStarted();
+
+        E currentSolution = encodingGenerator.get();
+        double bestFitness = fitnessFunction.applyAsDouble(currentSolution);
+        E bestSolution = currentSolution;
+        while (!stoppingCondition.searchMustStop()) {
+            E newSolution = encodingGenerator.get();
+            double newFitness = fitnessFunction.applyAsDouble(newSolution);
+            if (newFitness > bestFitness) {
+                bestFitness = newFitness;
+                bestSolution = newSolution;
+            }
+            stoppingCondition.notifyFitnessEvaluation();
+        }
+
+        return bestSolution;
     }
 
     @Override
     public StoppingCondition getStoppingCondition() {
-        throw new UnsupportedOperationException("Implement me");
+        return stoppingCondition;
     }
 
 }

@@ -33,6 +33,39 @@ public class OrderCrossover implements Crossover<TestOrder> {
      */
     @Override
     public TestOrder apply(TestOrder parent1, TestOrder parent2) {
-        throw new UnsupportedOperationException("Implement me");
+        int[] positions1 = parent1.getPositions();
+        int[] positions2 = parent2.getPositions();
+        int n = positions1.length;
+
+        if (n != positions2.length) {
+            throw new IllegalArgumentException("Parent encodings must have the same size.");
+        }
+
+        int point1 = random.nextInt(n);
+        int point2 = random.nextInt(n);
+        if (point1 > point2) {
+            int temp = point1;
+            point1 = point2;
+            point2 = temp;
+        }
+
+        int[] child = new int[n];
+        Set<Integer> copied = new HashSet<>();
+        for (int i = point1; i <= point2; i++) {
+            child[i] = positions1[i];
+            copied.add(positions1[i]);
+        }
+        
+        int currentIndex = 0;
+        for (int i = 0; i < n; i++) {
+            if (!copied.contains(positions2[i])) {
+                while (currentIndex >= point1 && currentIndex <= point2) {
+                    currentIndex++;
+                }
+                child[currentIndex++] = positions2[i];
+            }
+        }
+
+        return new TestOrder(parent1.getMutation(), child);
     }
 }
