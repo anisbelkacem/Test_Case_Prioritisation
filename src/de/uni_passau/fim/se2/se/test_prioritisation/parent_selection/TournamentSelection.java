@@ -57,20 +57,20 @@ public class TournamentSelection implements ParentSelection<TestOrder> {
         if (population == null || population.isEmpty()) {
             throw new IllegalArgumentException("Population cannot be null or empty");
         }
-
-        if (tournamentSize > population.size()) {
-            throw new IllegalArgumentException("Tournament size must be smaller than the population size");
+        if (tournamentSize == population.size()) {
+            return population.stream()
+                    .max(Comparator.comparing(fitnessFunction::applyAsDouble))
+                    .orElseThrow(() -> new IllegalStateException("Population is non-empty but no maximum found"));
         }
-    
-
-        // Randomly select `tournamentSize` individuals from the population
+        if (tournamentSize > population.size()) {
+            throw new IllegalArgumentException("Tournament size must be smaller than or equal to the population size");
+        }
         List<TestOrder> tournament = new ArrayList<>();
         for (int i = 0; i < tournamentSize; i++) {
             TestOrder randomIndividual = population.get(random.nextInt(population.size()));
             tournament.add(randomIndividual);
         }
 
-        // Find the fittest individual in the tournament
         TestOrder bestIndividual = null;
         double bestFitness = Double.NEGATIVE_INFINITY;
 
@@ -84,4 +84,5 @@ public class TournamentSelection implements ParentSelection<TestOrder> {
 
         return bestIndividual;
     }
+
 }
