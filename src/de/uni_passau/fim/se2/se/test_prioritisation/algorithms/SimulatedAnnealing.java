@@ -28,7 +28,7 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
     private final Random random;
 
     private double temperature;
-    private final double coolingRate = 0.99;  // Set a default cooling rate
+    private final double coolingRate = 0.97;  // Set a default cooling rate
     private final double initialTemperature = 1000;  // Set a default initial temperature
     /**
      * Constructs a new simulated annealing algorithm.
