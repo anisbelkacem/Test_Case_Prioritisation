@@ -55,7 +55,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
      */
     @Override
     public E findSolution() {
-        notifySearchStarted();
+        /*notifySearchStarted();
         int minSize = 50;
         int maxSize = 200; 
         int populationSize = random.nextInt(maxSize - minSize + 1) + minSize;
@@ -79,10 +79,12 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
                 population.remove(worstIndividual);
                 population.add(offspring);
             }
+            
         }
         return population.stream()
                 .max(Comparator.comparing(fitnessFunction::applyAsDouble))
-                .orElseThrow();
+                .orElseThrow();*/
+                throw new UnsupportedOperationException("Implement me");
     }
     
     @Override
