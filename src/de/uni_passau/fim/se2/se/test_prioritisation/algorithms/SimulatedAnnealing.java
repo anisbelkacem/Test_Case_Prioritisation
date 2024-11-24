@@ -21,15 +21,6 @@ import java.util.Random;
  */
 public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAlgorithm<E> {
 
-    private final StoppingCondition stoppingCondition;
-    private final EncodingGenerator<E> encodingGenerator;
-    private final FitnessFunction<E> energy;
-    private final int degreesOfFreedom;
-    private final Random random;
-
-    private double temperature;
-    private final double coolingRate = 0.99;  // Set a default cooling rate
-    private final double initialTemperature = 1000;  // Set a default initial temperature
     /**
      * Constructs a new simulated annealing algorithm.
      *
@@ -45,11 +36,7 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
             final FitnessFunction<E> energy,
             final int degreesOfFreedom,
             final Random random) {
-                this.stoppingCondition = stoppingCondition;
-                this.encodingGenerator = encodingGenerator;
-                this.energy = energy;
-                this.degreesOfFreedom = degreesOfFreedom;
-                this.random = random;
+        throw new UnsupportedOperationException("Implement me");
     }
 
     /**
@@ -58,39 +45,11 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
      */
     @Override
     public E findSolution() {
-        
-    notifySearchStarted();
-
-    
-    temperature = initialTemperature; 
-    E currentSolution = encodingGenerator.get(); 
-    double currentEnergy = energy.minimise(currentSolution); 
-
-    
-    while (!searchMustStop()) {
-        E newSolution = currentSolution.deepCopy();
-        newSolution = newSolution.mutate(); 
-        double newEnergy = energy.minimise(newSolution);
-        notifyFitnessEvaluation();
-
-        if (newEnergy < currentEnergy) {
-            currentSolution = newSolution;
-            currentEnergy = newEnergy;
-        } else {
-            double acceptanceProbability = Math.exp((currentEnergy - newEnergy) / temperature);
-            if (random.nextDouble() < acceptanceProbability) {
-                currentSolution = newSolution;
-                currentEnergy = newEnergy;
-            }
-        }
-
-        temperature *= coolingRate; 
+        throw new UnsupportedOperationException("Implement me");
     }
-    return currentSolution;
-}
 
     @Override
     public StoppingCondition getStoppingCondition() {
-        return stoppingCondition;
+        throw new UnsupportedOperationException("Implement me");
     }
 }
