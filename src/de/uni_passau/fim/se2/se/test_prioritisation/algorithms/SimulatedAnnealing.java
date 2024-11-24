@@ -58,34 +58,37 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
      */
     @Override
     public E findSolution() {
-
-    notifySearchStarted();
-
-    
-    temperature = initialTemperature; 
-    E currentSolution = encodingGenerator.get(); 
-    double currentEnergy = energy.minimise(currentSolution); 
-    while (!searchMustStop()) {
-        E newSolution = currentSolution.deepCopy();
-        newSolution = newSolution.mutate(); 
-        double newEnergy = energy.minimise(newSolution);
-        notifyFitnessEvaluation();
-
-        if (newEnergy < currentEnergy) {
-            currentSolution = newSolution;
-            currentEnergy = newEnergy;
-        } else {
-            double acceptanceProbability = Math.exp((currentEnergy - newEnergy) / temperature);
-            if (random.nextDouble() < acceptanceProbability) {
+        notifySearchStarted();
+        temperature = initialTemperature;
+        E currentSolution = encodingGenerator.get(); 
+        double currentFitness = energy.maximise(currentSolution); 
+        E bestSolution = currentSolution; 
+        double bestFitness = currentFitness;
+        while (!searchMustStop()) {
+            E newSolution = currentSolution.deepCopy();
+            newSolution = newSolution.mutate(); 
+            double newFitness = energy.maximise(newSolution); 
+            notifyFitnessEvaluation();
+            if (newFitness > currentFitness) {
+                
                 currentSolution = newSolution;
-                currentEnergy = newEnergy;
+                currentFitness = newFitness;
+            } else {
+                double acceptanceProbability = Math.exp((newFitness - currentFitness) / temperature);
+                if (random.nextDouble() < acceptanceProbability) {
+                    currentSolution = newSolution;
+                    currentFitness = newFitness;
+                }
             }
+            if (currentFitness > bestFitness) {
+                bestSolution = currentSolution;
+                bestFitness = currentFitness;
+            }
+            temperature *= coolingRate;
         }
-
-        temperature *= coolingRate; 
+        return bestSolution;
     }
-    return currentSolution;
-}
+
 
     @Override
     public StoppingCondition getStoppingCondition() {
