@@ -84,6 +84,6 @@ public double applyAsDouble(final TestOrder testOrder) throws NullPointerExcepti
      */
     @Override
     public double minimise(TestOrder encoding) throws NullPointerException {
-        return -applyAsDouble(encoding);
+        return 1-applyAsDouble(encoding);
     }
 }
