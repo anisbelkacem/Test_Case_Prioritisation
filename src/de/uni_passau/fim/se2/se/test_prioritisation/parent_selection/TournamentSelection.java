@@ -58,7 +58,7 @@ public class TournamentSelection implements ParentSelection<TestOrder> {
             throw new IllegalArgumentException("Population cannot be null or empty");
         }
 
-        if (tournamentSize >= population.size()) {
+        if (tournamentSize > population.size()) {
             throw new IllegalArgumentException("Tournament size must be smaller than the population size");
         }
     
