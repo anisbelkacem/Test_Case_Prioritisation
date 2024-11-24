@@ -50,8 +50,11 @@ public class Utils {
      * @return degrees of freedom
      */
     public static int degreesOfFreedom(final int testCases) {
-        return IntStream.rangeClosed(1, testCases)
-                .reduce(1, (a, b) -> a * b);
+        if(testCases<=0)
+        {
+            throw new IllegalArgumentException("degreeOfFreedom must be more than 0.");
+        }
+        return testCases-1;
     }
 
     /**
