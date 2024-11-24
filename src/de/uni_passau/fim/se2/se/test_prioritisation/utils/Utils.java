@@ -50,7 +50,8 @@ public class Utils {
      * @return degrees of freedom
      */
     public static int degreesOfFreedom(final int testCases) {
-        throw new UnsupportedOperationException("Implement me");
+        return IntStream.rangeClosed(1, testCases)
+                .reduce(1, (a, b) -> a * b);
     }
 
     /**
