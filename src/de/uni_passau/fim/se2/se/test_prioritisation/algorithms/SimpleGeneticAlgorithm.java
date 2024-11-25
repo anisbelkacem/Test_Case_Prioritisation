@@ -22,7 +22,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
     private final Crossover<E> crossover;
     private final ParentSelection<E> parentSelection;
     private final Random random;
-    private static final int POPULATION_SIZE = 20;
+    private static final int POPULATION_SIZE = 100;
     private static final double MUTATION_RATE = 0.1;
 
     /**
