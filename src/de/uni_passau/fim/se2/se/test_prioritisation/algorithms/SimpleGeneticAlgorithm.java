@@ -56,7 +56,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
     @Override
     public E findSolution() {
         notifySearchStarted(); 
-        int populationSize = 10;
+        int populationSize = 100;
         List<E> population = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
             population.add(encodingGenerator.get());
