@@ -22,6 +22,8 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
     private final Crossover<E> crossover;
     private final ParentSelection<E> parentSelection;
     private final Random random;
+    private static final int POPULATION_SIZE = 20;
+    private static final double MUTATION_RATE = 0.1;
 
     /**
      * Creates a new simple genetic algorithm with the given components.
@@ -55,33 +57,55 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
      */
     @Override
     public E findSolution() {
-        notifySearchStarted(); 
-        int populationSize = 20;
+        stoppingCondition.notifySearchStarted();
         List<E> population = new ArrayList<>();
-        for (int i = 0; i < populationSize; i++) {
-            population.add(encodingGenerator.get());
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            E individual = encodingGenerator.get();
+            population.add(individual);
+            stoppingCondition.notifyFitnessEvaluation();
+            if (stoppingCondition.searchMustStop()) return individual;
         }
-        while (!searchMustStop()) {
-            E parent1 = parentSelection.selectParent(population);
-            E parent2 = parentSelection.selectParent(population);
-            E offspring = crossover.apply(parent1, parent2);
-            double offspringFitness = fitnessFunction.applyAsDouble(offspring);
-            notifyFitnessEvaluation();
-    
-            E worstIndividual = population.stream()
-                    .min(Comparator.comparing(fitnessFunction::applyAsDouble))
-                    .orElseThrow();
-    
-            double worstFitness = fitnessFunction.applyAsDouble(worstIndividual);
-            if (offspringFitness > worstFitness) {
-                population.remove(worstIndividual);
-                population.add(offspring);
+
+        E bestSolution = null;
+        double bestFitness = Double.NEGATIVE_INFINITY;
+
+        while (!stoppingCondition.searchMustStop()) {
+            List<Double> fitnessValues = new ArrayList<>();
+            for (E individual : population) {
+                double fitness = fitnessFunction.applyAsDouble(individual);
+                fitnessValues.add(fitness);
+                stoppingCondition.notifyFitnessEvaluation();
+
+                if (stoppingCondition.searchMustStop()) break;
+
+                if (fitness > bestFitness) {
+                    bestFitness = fitness;
+                    bestSolution = individual;
+                }
             }
-            
+
+            if (stoppingCondition.searchMustStop()) break;
+            List<E> newPopulation = new ArrayList<>();
+            while (newPopulation.size() < POPULATION_SIZE) {
+                E parent1 = parentSelection.selectParent(population);
+                E parent2 = parentSelection.selectParent(population);
+
+                E offspring = crossover.apply(parent1, parent2);
+
+                if (random.nextDouble() < MUTATION_RATE) {
+                    offspring = offspring.getMutation().apply(offspring);
+                }
+                    
+                newPopulation.add(offspring);
+                stoppingCondition.notifyFitnessEvaluation();
+
+                if (stoppingCondition.searchMustStop()) break;
+            }
+
+            population = newPopulation;
         }
-        return population.stream()
-                .max(Comparator.comparing(fitnessFunction::applyAsDouble))
-                .orElseThrow();
+
+        return bestSolution;
     }
     
     @Override
