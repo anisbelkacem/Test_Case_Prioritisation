@@ -52,6 +52,7 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
                 this.random = random;
     }
 
+
     /**
      * Performs the Simulated Annealing algorithm to search for an optimal solution of the encoded problem.
      * Since Simulated Annealing is designed as a minimisation algorithm, optimal solutions are characterized by a minimal energy value.
