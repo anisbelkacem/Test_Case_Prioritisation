@@ -89,19 +89,21 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
             while (newPopulation.size() < POPULATION_SIZE) {
                 E parent1 = parentSelection.selectParent(population);
                 E parent2 = parentSelection.selectParent(population);
-
+                // Debugging output
+                if (parent1.equals(parent2)) {
+                    throw new IllegalStateException("same parent");
+                }
                 E offspring = crossover.apply(parent1, parent2);
 
                 if (random.nextDouble() < MUTATION_RATE) {
                     offspring = offspring.getMutation().apply(offspring);
                 }
-                    
+
                 newPopulation.add(offspring);
                 stoppingCondition.notifyFitnessEvaluation();
 
                 if (stoppingCondition.searchMustStop()) break;
             }
-
             population = newPopulation;
         }
 
