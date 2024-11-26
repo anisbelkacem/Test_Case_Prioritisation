@@ -61,36 +61,45 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
     public E findSolution() {
         notifySearchStarted();
         temperature = initialTemperature;
-        E currentSolution = encodingGenerator.get(); 
-        double currentFitness = energy.maximise(currentSolution); 
-        E bestSolution = currentSolution; 
+    
+        E currentSolution = encodingGenerator.get();
+        double currentFitness = energy.maximise(currentSolution);
+    
+        E bestSolution = currentSolution;
         double bestFitness = currentFitness;
+    
         while (!searchMustStop()) {
-            E newSolution = currentSolution.deepCopy();
-            newSolution = newSolution.mutate(); 
+
+            E newSolution = currentSolution.deepCopy().mutate();
             double newFitness = energy.maximise(newSolution); 
+
             notifyFitnessEvaluation();
-            if (newFitness > currentFitness) {
-                
+
+            if (newFitness > currentFitness || AcceptWorseSolution(currentFitness, newFitness)) {
                 currentSolution = newSolution;
                 currentFitness = newFitness;
-            } else {
-                double acceptanceProbability = Math.exp((newFitness - currentFitness) / temperature);
-                if (random.nextDouble() < acceptanceProbability) {
-                    currentSolution = newSolution;
-                    currentFitness = newFitness;
-                }
             }
+
             if (currentFitness > bestFitness) {
                 bestSolution = currentSolution;
                 bestFitness = currentFitness;
             }
-            temperature *= coolingRate;
+            updateTemperature();
         }
         return bestSolution;
     }
+    
+    private boolean AcceptWorseSolution(double currentFitness, double newFitness) {
+        double acceptanceProbability = Math.exp((newFitness - currentFitness) / temperature);
+        return random.nextDouble() < acceptanceProbability;
+    }
+    
+    private void updateTemperature() {
+        temperature *= coolingRate;
+    }
+    
 
-
+    
     @Override
     public StoppingCondition getStoppingCondition() {
         return stoppingCondition;

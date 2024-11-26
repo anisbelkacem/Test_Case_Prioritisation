@@ -24,6 +24,7 @@ public final class RandomSearch<E extends Encoding<E>> implements SearchAlgorith
             final StoppingCondition stoppingCondition,
             final EncodingGenerator<E> encodingGenerator,
             final FitnessFunction<E> fitnessFunction) {
+                
             this.stoppingCondition = stoppingCondition;
             this.encodingGenerator = encodingGenerator;
             this.fitnessFunction = fitnessFunction;
@@ -42,7 +43,7 @@ public final class RandomSearch<E extends Encoding<E>> implements SearchAlgorith
 
         while (!stoppingCondition.searchMustStop()) {
             E candidateSolution = encodingGenerator.get();
-            double candidateFitness = fitnessFunction.applyAsDouble(candidateSolution);
+            double candidateFitness = fitnessFunction.maximise(candidateSolution);
             stoppingCondition.notifyFitnessEvaluation();
             if (candidateFitness > bestFitness) {
                 bestFitness = candidateFitness;
