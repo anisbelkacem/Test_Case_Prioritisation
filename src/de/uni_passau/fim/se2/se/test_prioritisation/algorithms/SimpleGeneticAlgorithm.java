@@ -58,51 +58,68 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
     @Override
     public E findSolution() {
         stoppingCondition.notifySearchStarted();
-        List<E> population = new ArrayList<>();
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            E individual = encodingGenerator.get();
-            population.add(individual);
-            stoppingCondition.notifyFitnessEvaluation();
-            if (stoppingCondition.searchMustStop()) return individual;
-        }
+        List<E> population = initializePopulation();
 
         E bestSolution = null;
         double bestFitness = Double.NEGATIVE_INFINITY;
-
+    
         while (!stoppingCondition.searchMustStop()) {
-            List<Double> fitnessValues = new ArrayList<>();
-            for (E individual : population) {
-                double fitness = fitnessFunction.applyAsDouble(individual);
-                fitnessValues.add(fitness);
-                stoppingCondition.notifyFitnessEvaluation();
-
-                if (stoppingCondition.searchMustStop()) break;
-
-                if (fitness > bestFitness) {
-                    bestFitness = fitness;
-                    bestSolution = individual;
+            List<Double> fitnessValues = evaluatePopulationFitness(population);
+            for (int i = 0; i < fitnessValues.size(); i++) {
+                if (fitnessValues.get(i) > bestFitness) {
+                    bestFitness = fitnessValues.get(i);
+                    bestSolution = population.get(i);
                 }
             }
-
             if (stoppingCondition.searchMustStop()) break;
-            List<E> newPopulation = new ArrayList<>();
-            while (newPopulation.size() < POPULATION_SIZE) {
-                E parent1 = parentSelection.selectParent(population);
-                E parent2 = parentSelection.selectParent(population);
-                E offspring = crossover.apply(parent1, parent2);
-                if (random.nextDouble() < MUTATION_RATE) {
-                    offspring = offspring.getMutation().apply(offspring);
-                }
-                newPopulation.add(offspring);
-                stoppingCondition.notifyFitnessEvaluation();
-
-                if (stoppingCondition.searchMustStop()) break;
-            }
+    
+            List<E> newPopulation = generateNewPopulation(population);
             population = newPopulation;
         }
-
+    
         return bestSolution;
     }
+    
+    private List<E> initializePopulation() {
+        List<E> population = new ArrayList<>(POPULATION_SIZE);
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            population.add(encodingGenerator.get());
+            stoppingCondition.notifyFitnessEvaluation();
+            if (stoppingCondition.searchMustStop()) return population;
+        }
+        return population;
+    }
+    
+    private List<Double> evaluatePopulationFitness(List<E> population) {
+        List<Double> fitnessValues = new ArrayList<>(population.size());
+        for (E individual : population) {
+            double fitness = fitnessFunction.applyAsDouble(individual);
+            fitnessValues.add(fitness);
+            stoppingCondition.notifyFitnessEvaluation();
+            if (stoppingCondition.searchMustStop()) break;
+        }
+        return fitnessValues;
+    }
+    
+    private List<E> generateNewPopulation(List<E> population) {
+        List<E> newPopulation = new ArrayList<>(POPULATION_SIZE);
+        while (newPopulation.size() < POPULATION_SIZE) {
+            E parent1 = parentSelection.selectParent(population);
+            E parent2 = parentSelection.selectParent(population);
+            E offspring = crossover.apply(parent1, parent2);
+    
+            if (random.nextDouble() < MUTATION_RATE) {
+                offspring = offspring.getMutation().apply(offspring);
+            }
+    
+            newPopulation.add(offspring);
+            stoppingCondition.notifyFitnessEvaluation();
+    
+            if (stoppingCondition.searchMustStop()) break;
+        }
+        return newPopulation;
+    }
+    
     
     @Override
     public StoppingCondition getStoppingCondition() {
