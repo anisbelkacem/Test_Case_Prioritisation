@@ -28,9 +28,6 @@ public class ShiftToBeginningMutation implements Mutation<TestOrder> {
     @Override
 public TestOrder apply(TestOrder encoding) {
     int[] positions = encoding.getPositions();
-    if (positions.length == 0) {
-        throw new IllegalArgumentException("Cannot mutate an empty test order.");
-    }
 
     int randomIndex = random.nextInt(positions.length);
 

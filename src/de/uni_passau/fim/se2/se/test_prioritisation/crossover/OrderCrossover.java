@@ -33,6 +33,10 @@ public class OrderCrossover implements Crossover<TestOrder> {
      */
     @Override
     public TestOrder apply(TestOrder parent1, TestOrder parent2) {
+        if(parent1 ==null || parent2 == null) {
+            throw new NullPointerException("Both parents must not be null");
+        }
+
         int[] positions1 = parent1.getPositions();
         int[] positions2 = parent2.getPositions();
         int n = positions1.length;
