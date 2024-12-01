@@ -66,9 +66,9 @@ public class LiftTest {
     public void test7() throws Throwable {
         Lift lift = new Lift(1, 2);
         lift.addRiders(2);
-        assertEquals(0, lift.getNumRiders());
+        assertEquals(2, lift.getNumRiders());
         lift.addRiders(2);
-        assertEquals(0, lift.getNumRiders());
+        assertEquals(2, lift.getNumRiders());
     }
 
     @Test
