@@ -27,6 +27,10 @@ public class ShiftToBeginningMutation implements Mutation<TestOrder> {
      */
     @Override
 public TestOrder apply(TestOrder encoding) {
+    if(encoding == null)
+    {
+        throw new NullPointerException("encoding is null");
+    }
     int[] positions = encoding.getPositions();
 
     int randomIndex = random.nextInt(positions.length);
