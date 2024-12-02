@@ -43,7 +43,7 @@ public abstract class Encoding<E extends Encoding<E>> implements SelfTyped<E> {
      *
      * @return the mutated solution encoding
      */
-    public final E mutate() {
+    public E mutate() {
         return mutation.apply(self());
     }
 
