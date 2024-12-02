@@ -25,6 +25,12 @@ public class ShiftToBeginningMutationTest {
     }
 
     @Test
+    void testApplyWithoutEncoding() {
+        assertThrows(NullPointerException.class, () -> {
+            mutation.apply(null);
+        });
+    }
+    @Test
     void testApplyValidEncoding() {
         int[] initialPositions = {0, 1, 2, 3, 4};
         TestOrder testOrder = new TestOrder(mutation, initialPositions);
