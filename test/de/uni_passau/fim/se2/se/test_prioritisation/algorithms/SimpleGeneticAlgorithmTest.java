@@ -47,23 +47,15 @@ class SimpleGeneticAlgorithmTest {
 
     @Test
     void testFindSolution() {
-        // Create a mock mutation object
         Mutation<MockEncoding> mockMutation = mock(Mutation.class);
-        
-        // Create an instance of MockEncoding with the mock mutation
         MockEncoding initialSolution = new MockEncoding(mockMutation);
-        
-        // Mock behavior for stopping condition and fitness function
-        when(stoppingCondition.searchMustStop()).thenReturn(false).thenReturn(true); // Allow one iteration
-        when(encodingGenerator.get()).thenReturn(initialSolution); // Ensure encoding is generated
-        when(fitnessFunction.applyAsDouble(any())).thenReturn(1.0); // Provide a fitness value
-        when(parentSelection.selectParent(any())).thenReturn(initialSolution); // Select parent
-        when(crossover.apply(any(), any())).thenReturn(initialSolution); // Perform crossover
+        when(stoppingCondition.searchMustStop()).thenReturn(false).thenReturn(true); 
+        when(encodingGenerator.get()).thenReturn(initialSolution); 
+        when(fitnessFunction.applyAsDouble(any())).thenReturn(1.0); 
+        when(parentSelection.selectParent(any())).thenReturn(initialSolution); 
+        when(crossover.apply(any(), any())).thenReturn(initialSolution); 
 
-        // Run the algorithm
         MockEncoding solution = algorithm.findSolution();
-
-        // Verify results
         //assertNotNull(solution, "The solution should not be null");
     }
 

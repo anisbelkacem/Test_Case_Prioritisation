@@ -4,6 +4,7 @@ import de.uni_passau.fim.se2.se.test_prioritisation.crossover.Crossover;
 import de.uni_passau.fim.se2.se.test_prioritisation.encodings.Encoding;
 import de.uni_passau.fim.se2.se.test_prioritisation.encodings.EncodingGenerator;
 import de.uni_passau.fim.se2.se.test_prioritisation.fitness_functions.FitnessFunction;
+import de.uni_passau.fim.se2.se.test_prioritisation.mutations.Mutation;
 import de.uni_passau.fim.se2.se.test_prioritisation.parent_selection.ParentSelection;
 import de.uni_passau.fim.se2.se.test_prioritisation.stopping_conditions.StoppingCondition;
 
@@ -14,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements SearchAlgorithm<E> {
 
     private final StoppingCondition stoppingCondition;
@@ -22,7 +27,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
     private final Crossover<E> crossover;
     private final ParentSelection<E> parentSelection;
     private final Random random;
-    private static final int POPULATION_SIZE = 100;
+    private static final int POPULATION_SIZE = 100; // Consider making this configurable
     private static final double MUTATION_RATE = 0.1;
 
     /**
@@ -42,12 +47,12 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
             final Crossover<E> crossover,
             final ParentSelection<E> parentSelection,
             final Random random) {
-                this.stoppingCondition = stoppingCondition;
-                this.encodingGenerator = encodingGenerator;
-                this.fitnessFunction = fitnessFunction;
-                this.crossover = crossover;
-                this.parentSelection = parentSelection;
-                this.random = random;
+        this.stoppingCondition = stoppingCondition;
+        this.encodingGenerator = encodingGenerator;
+        this.fitnessFunction = fitnessFunction;
+        this.crossover = crossover;
+        this.parentSelection = parentSelection;
+        this.random = random;
     }
 
     /**
@@ -62,7 +67,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
 
         E bestSolution = null;
         double bestFitness = Double.NEGATIVE_INFINITY;
-    
+
         while (!stoppingCondition.searchMustStop()) {
             List<Double> fitnessValues = evaluatePopulationFitness(population);
             for (int i = 0; i < fitnessValues.size(); i++) {
@@ -72,14 +77,14 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
                 }
             }
             if (stoppingCondition.searchMustStop()) break;
-    
+
             List<E> newPopulation = generateNewPopulation(population);
             population = newPopulation;
         }
-    
+
         return bestSolution;
     }
-    
+
     private List<E> initializePopulation() {
         List<E> population = new ArrayList<>(POPULATION_SIZE);
         for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -89,7 +94,7 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
         }
         return population;
     }
-    
+
     private List<Double> evaluatePopulationFitness(List<E> population) {
         List<Double> fitnessValues = new ArrayList<>(population.size());
         for (E individual : population) {
@@ -100,27 +105,34 @@ public final class SimpleGeneticAlgorithm<E extends Encoding<E>> implements Sear
         }
         return fitnessValues;
     }
-    
+
     private List<E> generateNewPopulation(List<E> population) {
         List<E> newPopulation = new ArrayList<>(POPULATION_SIZE);
         while (newPopulation.size() < POPULATION_SIZE) {
             E parent1 = parentSelection.selectParent(population);
             E parent2 = parentSelection.selectParent(population);
             E offspring = crossover.apply(parent1, parent2);
-    
+
+            
             if (random.nextDouble() < MUTATION_RATE) {
-                offspring = offspring.getMutation().apply(offspring);
+                Mutation<E> mutation = offspring.getMutation();
+                if (mutation != null) {
+                    offspring = mutation.apply(offspring);
+                }
             }
-    
+
             newPopulation.add(offspring);
             stoppingCondition.notifyFitnessEvaluation();
-    
+
             if (stoppingCondition.searchMustStop()) break;
         }
+        while (newPopulation.size() < POPULATION_SIZE) {
+            newPopulation.add(population.get(random.nextInt(population.size())));
+        }
+
         return newPopulation;
     }
-    
-    
+
     @Override
     public StoppingCondition getStoppingCondition() {
         return stoppingCondition;
