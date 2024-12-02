@@ -18,7 +18,6 @@ class RandomSearchTest {
 
     @BeforeEach
     void setUp() {
-        // Set up mocks or real objects as needed
         stoppingCondition = mock(StoppingCondition.class);
         encodingGenerator = mock(EncodingGenerator.class);
         fitnessFunction = mock(FitnessFunction.class);

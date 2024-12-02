@@ -24,60 +24,87 @@ class SimulatedAnnealingTest {
 
     @BeforeEach
     void setUp() {
-        // Ensure that all necessary objects are mocked properly
+        
         stoppingCondition = mock(StoppingCondition.class);
         encodingGenerator = mock(EncodingGenerator.class);
         fitnessFunction = mock(FitnessFunction.class);
         random = mock(Random.class);
 
-        // Initialize the SimulatedAnnealing with mocked dependencies
+        
         simulatedAnnealing = new SimulatedAnnealing<>(
                 stoppingCondition,
                 encodingGenerator,
                 fitnessFunction,
-                5,  // degrees of freedom (for example)
+                5,
                 random
         );
     }
 
     @Test
     void testFindSolution() {
-        // Create the mock mutation object
         Mutation<MockEncoding> mockMutation = mock(Mutation.class);
-
-        // Create mock Encoding objects with mutation
         MockEncoding initialSolution = new MockEncoding(mockMutation);
         MockEncoding mutatedSolution = new MockEncoding(mockMutation);
 
-        // Mock the behavior of encoding generator to return initial solution
         when(encodingGenerator.get()).thenReturn(initialSolution);
-
-        // Mock fitness function to return a fitness value for the initial solution
         when(fitnessFunction.maximise(initialSolution)).thenReturn(10.0);
-
-        // Set up behavior for mutated solution and fitness evaluation
-        when(fitnessFunction.maximise(mutatedSolution)).thenReturn(8.0);
-
-        // Mock stopping condition to stop after 3 iterations
-        when(stoppingCondition.searchMustStop()).thenReturn(false, false, true);
-
-        // Mock random behavior for acceptance of worse solutions
-        when(random.nextDouble()).thenReturn(0.5);
-
-        // Run the simulated annealing algorithm
+        when(fitnessFunction.maximise(mutatedSolution)).thenReturn(12.0);
+        when(fitnessFunction.maximise(mutatedSolution)).thenReturn(20.0);
+        when(stoppingCondition.searchMustStop()).thenReturn(false, false, false,true);
+        when(random.nextDouble()).thenReturn(0.1);
         MockEncoding bestSolution = simulatedAnnealing.findSolution();
-
-        // Assert that the best solution is the initial one with the highest fitness
         assertEquals(initialSolution, bestSolution, "The best solution should be the one with the highest fitness.");
 
-        // Verify that methods were called on mock objects
-        verify(encodingGenerator, times(1)).get();  // Verify encoding generator is called once
-        verify(fitnessFunction, atLeast(1)).maximise(any());  // Verify fitness function is called at least once
-        verify(random, atLeast(1)).nextDouble();  // Verify random.nextDouble() is called
-        verify(stoppingCondition, atLeast(3)).searchMustStop();  // Verify stopping condition check happens at least 3 times
+        verify(encodingGenerator, times(1)).get(); 
+        verify(fitnessFunction, atLeast(1)).maximise(any()); 
+        verify(random, atLeast(1)).nextDouble(); 
+        verify(stoppingCondition, atLeast(3)).searchMustStop(); 
+    }
+    
+    @Test
+    void testUpdateCurrentSolutionOnly() {
+        Mutation<MockEncoding> mockMutation = mock(Mutation.class);
+        MockEncoding initialSolution = new MockEncoding(mockMutation);
+        MockEncoding worseSolution = new MockEncoding(mockMutation);
+
+        when(encodingGenerator.get()).thenReturn(initialSolution);
+        when(fitnessFunction.maximise(initialSolution)).thenReturn(10.0); 
+        when(fitnessFunction.maximise(worseSolution)).thenReturn(8.0);   
+        when(stoppingCondition.searchMustStop()).thenReturn(false, true);
+        when(random.nextDouble()).thenReturn(0.8); 
+
+        MockEncoding bestSolution = simulatedAnnealing.findSolution();
+        assertEquals(initialSolution, bestSolution, 
+            "Best solution should not change when only the current solution is updated.");
+        verify(encodingGenerator, times(1)).get();
+        verify(fitnessFunction, atLeast(2)).maximise(any());
+    }
+    @Test
+    void testUpdateBestSolutionOnly() {
+        Mutation<MockEncoding> mockMutation = mock(Mutation.class);
+        MockEncoding initialSolution = mock(MockEncoding.class); 
+        MockEncoding betterSolution = mock(MockEncoding.class);  
+
+        
+        when(encodingGenerator.get()).thenReturn(initialSolution);
+        when(fitnessFunction.maximise(initialSolution)).thenReturn(10.0); 
+        when(fitnessFunction.maximise(betterSolution)).thenReturn(15.0); 
+        when(initialSolution.deepCopy()).thenReturn(initialSolution);
+        when(initialSolution.mutate()).thenReturn(betterSolution);
+        when(stoppingCondition.searchMustStop()).thenReturn(false, true);
+
+        MockEncoding bestSolution = simulatedAnnealing.findSolution();
+        assertEquals(betterSolution, bestSolution,
+            "Best solution should be updated to the better solution.");
+        verify(encodingGenerator, times(1)).get();
+        verify(fitnessFunction, times(2)).maximise(any());
+        verify(stoppingCondition, times(2)).searchMustStop(); 
     }
 
-    // A mock encoding class for testing
+
+
+
+    
     static class MockEncoding extends Encoding<MockEncoding> {
 
         private final Mutation<MockEncoding> mutation;

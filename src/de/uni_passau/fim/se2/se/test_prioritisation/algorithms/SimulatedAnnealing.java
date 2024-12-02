@@ -76,14 +76,17 @@ public final class SimulatedAnnealing<E extends Encoding<E>> implements SearchAl
             notifyFitnessEvaluation();
 
             if (newFitness > currentFitness || AcceptWorseSolution(currentFitness, newFitness)) {
+                //System.out.println("Updating curret solution");
                 currentSolution = newSolution;
                 currentFitness = newFitness;
             }
 
             if (currentFitness > bestFitness) {
+                //System.out.println("Updating best solution.");
                 bestSolution = currentSolution;
                 bestFitness = currentFitness;
             }
+            
             updateTemperature();
         }
         return bestSolution;
