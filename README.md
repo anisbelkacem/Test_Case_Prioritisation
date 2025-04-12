@@ -30,13 +30,13 @@ Test cases are represented as a permutation of integers from 0 to n-1.
 Example: [2, 4, 1, 0, 3]
 This means test case 2 is run first, test case 4 second, and so on.
 ---
-#🔧 Implemented Components
-#✅ Solution Encoding
+🔧 Implemented Components
+✅ Solution Encoding
 TestOrder: Ensures valid permutations
 
 TestOrderGenerator: Creates random valid permutations
 ---
-#🔁 Operators
+🔁 Operators
 ShiftToBeginningMutation: Moves a random test case to the start
 
 OrderCrossover: Order-based crossover (OX1)
@@ -48,10 +48,10 @@ APLC: Average Percentage of Line Coverage
 
 Higher APLC → better prioritisation
 ---
-#⏱️ Stopping Condition
+⏱️ Stopping Condition
 MaxFitnessEvaluations: Stops the algorithm after max evaluations
 ---
-#❄️ Simulated Annealing Details
+❄️ Simulated Annealing Details
 SA adapts APLC for minimisation by negating it
 
 Initial temperature τ₀ is based on random walk energy difference:
